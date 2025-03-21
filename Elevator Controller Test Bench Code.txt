@@ -1,0 +1,46 @@
+ // Initial block for simulation 
+    initial begin 
+        // Initialize signals 
+        clk = 0; 
+        reset = 1;            // Start with reset active 
+        req_floor = 4'b0000;   // No floor requests 
+        current_floor = 2'b00; // Starting at floor 0 
+        emergency_stop = 0;    // Emergency stop not active 
+         
+        // Apply reset 
+        #10 reset = 0; // Release reset after 10 ns 
+         
+        // Test case 1: Request floor 2 while at floor 0 
+        #10 req_floor = 4'b0100;   // Request floor 2 
+        current_floor = 2'b00;     // Still at floor 0 
+        #40; // Wait for state transition 
+ 
+        // Test case 2: Request floor 3 while at floor 0 
+        #10 req_floor = 4'b1000;   // Request floor 3 
+        current_floor = 2'b00;     // Still at floor 0 
+        #40; // Wait for state transition 
+         
+        // Test case 3: Emergency stop activation 
+        #10 emergency_stop = 1; // Activate emergency stop 
+        #10 emergency_stop = 0; // Deactivate emergency stop 
+        #40; // Wait for state transition 
+ 
+        // Test case 4: Request multiple floors while at floor 1 
+        #10 req_floor = 4'b0110;   // Request floors 1 and 2 
+        current_floor = 2'b01;     // Starting from floor 1 
+        #40; // Wait for state transition 
+ 
+        // Test case 5: Clear requests and return to IDLE 
+        #10 req_floor = 4'b0000;   // Clear all floor requests 
+        current_floor = 2'b00;     // Reset to floor 0 
+        #40; // Wait for state transition 
+ 
+        // Test case 6: Request for a floor above the current one while at floor 1 
+        #10 req_floor = 4'b1000;   // Request floor 3 
+        current_floor = 2'b01;     // Currently at floor 1 
+        #40; // Wait for state transition 
+         
+        // Test case 7: Request for a floor below the current one while at floor 2 
+        #10 req_floor = 4'b0001;   // Request floor 0 
+        current_floor = 2'b10;     // Currently at floor 2 
+        #40; // Wait for state transition

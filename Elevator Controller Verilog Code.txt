@@ -1,0 +1,38 @@
+module elevator_controller ( 
+    input wire clk,                 // Clock signal 
+    input wire reset,               // Reset signal 
+    input wire [3:0] req_floor,     // Request signals for floors (4 floors: 0 to 3) 
+    input wire [1:0] current_floor, // Current floor indicator (2 bits to represent floors 0 to 3) 
+    input wire emergency_stop,      // Emergency stop signal 
+    output reg [1:0] motor_dir,     // Motor direction (00: Stop, 01: Up, 10: Down) 
+    output reg door_open,           // Door open signal 
+    output reg [1:0] floor_display  // Current floor to display (2 bits) 
+); 
+ 
+    // State encoding 
+    // We use parameter to define the states for compatibility with ISE. 
+    parameter IDLE       = 3'b000;  // Idle state 
+    parameter MOVING_UP  = 3'b001;  // Moving up state 
+    parameter MOVING_DOWN= 3'b010;  // Moving down state 
+    parameter DOOR_OPEN  = 3'b011;  // Door open state 
+    parameter EMERGENCY  = 3'b100;  // Emergency state 
+ 
+    reg [2:0] state, next_state;  // Declare state variables as 3bit wide register 
+ 
+    // Internal register for handling active floor requests (4-bit for 4 floors) 
+    reg [3:0] floor_requests;  
+ 
+    // Initialization (Reset logic) 
+    always @(posedge clk or posedge reset) begin 
+        if (reset) begin 
+            state <= IDLE;             // Set initial state to IDLE 
+            floor_requests <= 4'b0000; // Clear floor requests 
+            motor_dir <= 2'b00;        // Stop motor 
+            door_open <= 0;            // Door closed initially 
+        end else begin 
+            state <= next_state;       // Update state to the next state 
+            floor_requests <= floor_requests | req_floor; // Accumulate requests 
+        end 
+    end// Output logic for motor control and door control 
+always @(*) begin 
+motor_control = 2'b00; // Default to stop
